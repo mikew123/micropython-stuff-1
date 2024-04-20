@@ -1,0 +1,5 @@
+
+
+# XX:XX:XX:XX:XX:XX
+ROBO24_MAC_ADDRESS = b'\x00\x00\x00\x00\x00\x00'
+
