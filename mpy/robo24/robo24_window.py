@@ -216,6 +216,7 @@ class Robo24MissionWindow:
         return Color.GOOD_LABEL
 
     def get_telemetry_packet(self, packet):
+        print(packet)
         self.mission.process_telemetry_packet(packet)
 
     def about_to_close_run_mission(self, window):
@@ -233,7 +234,8 @@ class Robo24MissionWindow:
         self.trigger_pin = Pin(TRIGGER_PIN, Pin.IN, Pin.PULL_UP)
         self.trigger_connected_pin = Pin(TRIGGER_CONNECTED_PIN, Pin.IN, Pin.PULL_UP)
         self.update_timer = Timer(1, mode=Timer.PERIODIC, freq=10, callback=self.update)
-        self.telemetry = Telemetry(ROBO24_MAC_ADDRESS)
+        self.telemetry = Telemetry(ROBO24_MAC_ADDRESS, WIFI_CHANNEL_NUM)
+        self.telemetry.send_packet("{\"mission\": \"6can\"}")
         self.telemetry.register_telemetry_callback(self.get_telemetry_packet)
         self.running_mission = True
 

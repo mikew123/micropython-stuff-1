@@ -11,6 +11,15 @@ import time, esp32, machine
 from machine import Pin
 
 
+#################
+from secret import *
+from telemetry import Telemetry
+t = Telemetry(ROBO24_MAC_ADDRESS,WIFI_CHANNEL_NUM)
+t.send_packet(b"ROBO24 test")
+t.shutdown()
+
+#################
+
 sleep_flag = False
 
 def sleep_handler():
