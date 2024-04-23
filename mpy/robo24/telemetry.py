@@ -23,7 +23,7 @@ class Telemetry:
     def register_telemetry_callback(self, callback):
         self.telemetry_callback = callback
 
-    # Packets are JSON strings
+    # Packets are JSON strings {"rv"}
     def process_packet(self, packet_bytes):
         packet = json.loads(packet_bytes)
         if self.telemetry_callback is not None:
