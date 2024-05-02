@@ -121,14 +121,14 @@ class Robo24MissionWindow:
         middle_view.add_component(label)
 
         button_y = 60
-        button = VisualButton(Rectangle(Point(0, button_y), Point(160, 35)), "RUN", font_25, Color.BUTTON)
+        button = VisualButton(Rectangle(Point(0, button_y), Point(160, 35)), "RUN HOME", font_25, Color.BUTTON)
         middle_view.add_component(button)
-        button.register_click_handler(self.clicked_run_mission, mission_name)
+        button.register_click_handler(self.clicked_run_mission, f"{mission_name}_home")
 
         button_y += 40
-        button = VisualButton(Rectangle(Point(0, button_y), Point(160, 35)), "CONFIGURE", font_25, Color.BUTTON)
+        button = VisualButton(Rectangle(Point(0, button_y), Point(160, 35)), "RUN DPRG", font_25, Color.BUTTON)
         middle_view.add_component(button)
-        button.register_click_handler(self.clicked_edit_mission, mission_name)
+        button.register_click_handler(self.clicked_run_mission, f"{mission_name}_dprg")
 
         return window
 
@@ -227,7 +227,8 @@ class Robo24MissionWindow:
         self.running_mission = False
 
     def clicked_run_mission(self, mission_name):
-        print('Run Mission: {}'.format(mission_name))
+        packet_str:str = '{"mission": "' + f'{mission_name}' + '"}'
+        print(f'Run Mission: {packet_str}')
         self.window_manager.disable_screensaver()
         self.mission = Robo24Mission()
         self.window_manager.push_window(self.build_robo24_mission_run_window(mission_name))
@@ -235,13 +236,13 @@ class Robo24MissionWindow:
         self.trigger_connected_pin = Pin(TRIGGER_CONNECTED_PIN, Pin.IN, Pin.PULL_UP)
         self.update_timer = Timer(1, mode=Timer.PERIODIC, freq=10, callback=self.update)
         self.telemetry = Telemetry(ROBO24_MAC_ADDRESS, WIFI_CHANNEL_NUM)
-        self.telemetry.send_packet("{\"mission\": \"6can\"}")
+        self.telemetry.send_packet(packet_str)
         self.telemetry.register_telemetry_callback(self.get_telemetry_packet)
         self.running_mission = True
 
-    def clicked_edit_mission(self, mission_name):
-        print('Edit Mission: {}'.format(mission_name))
-        Robo24EditMissionWindow(self.window_manager, self.display)
+    # def clicked_run_dprg_mission(self, mission_name):
+    #     print('Edit Mission: {}'.format(mission_name))
+    #     Robo24EditMissionWindow(self.window_manager, self.display)
 
 
 class Robo24EditMissionWindow:
@@ -613,7 +614,7 @@ class Robo24MotorWindow:
         self.build_main_window()
 
     def build_main_window(self):
-        names = ['Main', 'Steering', 'R/C']
+        names = ['Claw','Main', 'Steering', 'R/C']
         windows = []
         for name in names:
             windows.append(self.build_window_for_motor(name))
@@ -637,12 +638,37 @@ class Robo24MotorWindow:
         label = VisualLabel(Point(0, 20), 'Motor: {}'.format(motor_name), font_25, True, Color.LABEL)
         middle_view.add_component(label)
 
-        button_y = 60
-        button = VisualButton(Rectangle(Point(0, button_y), Point(160, 35)), 'TEST', font_25, Color.BUTTON)
-        middle_view.add_component(button)
-        button.register_click_handler(self.clicked_test_motor, motor_name)
+        if (motor_name!='Claw') :
+            button_y = 60
+            button = VisualButton(Rectangle(Point(0, button_y), Point(160, 35)), 'TEST', font_25, Color.BUTTON)
+            middle_view.add_component(button)
+            button.register_click_handler(self.clicked_test_motor, motor_name)
+
+        else : # Claw
+            button_y = 60
+            button = VisualButton(Rectangle(Point(0, button_y), Point(160, 35)), 'OPEN', font_25, Color.BUTTON)
+            middle_view.add_component(button)
+            button.register_click_handler(self.clicked_claw_motor, "OPEN")
+            
+            button_y += 40
+            button = VisualButton(Rectangle(Point(0, button_y), Point(160, 35)), 'CLOSE', font_25, Color.BUTTON)
+            middle_view.add_component(button)
+            button.register_click_handler(self.clicked_claw_motor, "CLOSE")
 
         return window
+
+    def clicked_claw_motor(self, open_close:str) ->None:
+        self.telemetry = Telemetry(ROBO24_MAC_ADDRESS, WIFI_CHANNEL_NUM)
+
+        if (open_close == "OPEN") :
+            print("Claw OPEN")
+            self.telemetry.send_packet("{\"motor\": \"claw\", \"action\": \"open\"}")
+
+        else :
+            print("Claw CLOSE")
+            self.telemetry.send_packet("{\"motor\": \"claw\", \"action\": \"close\"}")
+
+        self.telemetry.shutdown()
 
     def clicked_test_motor(self, motor_name):
         if motor_name == 'Main':
