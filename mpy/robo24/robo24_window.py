@@ -167,8 +167,8 @@ class Robo24MissionWindow:
         self.heading_label = VisualLabel(Rectangle(Point(0, 100), Point(160, 20)), 'Heading: 325', font_15, True, Color.LABEL, Color.BACKGROUND)
         middle_view.add_component(self.heading_label)
 
-        self.robot_voltage_label = VisualLabel(Rectangle(Point(37, 10), Point(90, 20)), 'Robot 12.3v', font_15, False, Color.GOOD_LABEL, Color.BACKGROUND)
-        bottom_view.add_component(self.robot_voltage_label)
+        self.robot_bat_label = VisualLabel(Rectangle(Point(37, 10), Point(90, 20)), 'Bat 15.5v 0.95a', font_15, False, Color.GOOD_LABEL, Color.BACKGROUND)
+        bottom_view.add_component(self.robot_bat_label)
 
         self.urc_voltage_label = VisualLabel(Rectangle(Point(127, 10), Point(90, 20)), 'URC 4.15v', font_15, False, Color.GOOD_LABEL, Color.BACKGROUND)
         bottom_view.add_component(self.urc_voltage_label)
@@ -197,8 +197,8 @@ class Robo24MissionWindow:
         self.target_label.set_text(self.mission.target_string())
         self.position_label.set_text(self.mission.position_string())
         self.heading_label.set_text(self.mission.heading_string())
-        self.robot_voltage_label.set_text(self.mission.robot_voltage_string())
-        self.robot_voltage_label.set_color(self.voltage_color(self.mission.robot_voltage, 3))
+        self.robot_bat_label.set_text(self.mission.robot_bat_string())
+        self.robot_bat_label.set_color(self.voltage_color(self.mission.robot_voltage, 4))
         self.urc_voltage_label.set_text(self.mission.urc_voltage_string())
         self.urc_voltage_label.set_color(self.voltage_color(self.mission.urc_voltage, 1))
 
@@ -476,7 +476,8 @@ class Robo24Mission:
         self.target_name = 'Finish'
         self.position = Point(0.0, 0.0)
         self.heading = 0
-        self.robot_voltage = 12.4
+        self.robot_voltage = 15.5
+        self.robot_current = 0.95
 
     def update(self):
         self.update_count += 1
@@ -540,8 +541,8 @@ class Robo24Mission:
     def heading_string(self):
         return 'Heading: {} deg'.format(self.heading)
 
-    def robot_voltage_string(self):
-        return 'Robot {:.1f}v'.format(self.robot_voltage)
+    def robot_bat_string(self):
+        return 'Bat {:.1f}v {:.2f)a'.format(self.robot_voltage, self.robot_current)
 
     def urc_voltage_string(self):
         return 'URC {:.2f}v'.format(self.urc_voltage)
@@ -549,6 +550,8 @@ class Robo24Mission:
     def process_telemetry_packet(self, packet):
         if 'rv' in packet:
             self.robot_voltage = packet['rv']
+        if 'ra' in packet:
+            self.robot_current = packet['ra']
         if 'heading' in packet:
             self.heading = packet['heading']
         if 'pos' in packet:
