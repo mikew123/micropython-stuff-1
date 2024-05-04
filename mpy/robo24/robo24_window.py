@@ -553,7 +553,7 @@ class Robo24Mission:
         return 'Heading: {} deg'.format(self.heading)
 
     def robot_bat_string(self):
-        return 'Bat {:.1f}v {:.2f)a'.format(self.robot_voltage, self.robot_current)
+        return '{:.1f}v {:.2f}a'.format(self.robot_voltage, self.robot_current)
 
     def urc_voltage_string(self):
         return 'URC {:.2f}v'.format(self.urc_voltage)
@@ -676,11 +676,17 @@ class Robo24MotorWindow:
 
         if (open_close == "OPEN") :
             print("Claw OPEN")
-            self.telemetry.send_packet("{\"motor\": \"claw\", \"action\": \"open\"}")
+            cmd_json = {"claw": {"open": 0, "time": 1000}}
+            cmd_str = json.dumps(cmd_json)+"\0"
+            self.telemetry.send_packet(cmd_str)
+            #self.telemetry.send_packet("{\"motor\": \"claw\", \"action\": \"open\"}")
 
         else :
             print("Claw CLOSE")
-            self.telemetry.send_packet("{\"motor\": \"claw\", \"action\": \"close\"}")
+            cmd_json = {"claw": {"open": 100, "time": 1000}}
+            cmd_str = json.dumps(cmd_json)+"\0"
+            self.telemetry.send_packet(cmd_str)
+            #self.telemetry.send_packet("{\"motor\": \"claw\", \"action\": \"close\"}")
 
         self.telemetry.shutdown()
 
