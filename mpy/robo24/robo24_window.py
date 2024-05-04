@@ -173,8 +173,19 @@ class Robo24MissionWindow:
         self.urc_voltage_label = VisualLabel(Rectangle(Point(127, 10), Point(90, 20)), 'URC 4.15v', font_15, False, Color.GOOD_LABEL, Color.BACKGROUND)
         bottom_view.add_component(self.urc_voltage_label)
 
+        # Make an invisible button to toggle run state 
+        button = VisualButton(Rectangle(Point(0, 10), Point(160, 80)), '', font_15, Color.BUTTON, False)
+        middle_view.add_component(button)
+        button.register_click_handler(self.toggle_run_state)
+
         self.run_window.register_about_to_close(self.about_to_close_run_mission)
         return self.run_window
+
+    def toggle_run_state(self):
+        toggle_cmd_str:str = "{\"run_state\": \"toggle\"}\0"
+        print(toggle_cmd_str)
+        self.telemetry.send_packet(toggle_cmd_str)
+
 
     def update_trigger(self):
         if self.trigger_connected_pin.value() == 1:
@@ -227,7 +238,7 @@ class Robo24MissionWindow:
         self.running_mission = False
 
     def clicked_run_mission(self, mission_name):
-        packet_str:str = '{"mission": "' + f'{mission_name}' + '"}'
+        packet_str:str = "{\"mission\": \"" + mission_name + "\"}\0"
         print(f'Run Mission: {packet_str}')
         self.window_manager.disable_screensaver()
         self.mission = Robo24Mission()
