@@ -96,7 +96,7 @@ class Robo24MissionWindow:
         self.cone_sets = []
 
     def build_main_window(self):
-        mission_names = ['6-can', '4-corner', 'Quick trip']
+        mission_names = ['6-can', '4-corner', 'Quick-trip', 'Waypoints']
         windows = []
         for name in mission_names:
             windows.append(self.build_window_for_mission(name))
