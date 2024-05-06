@@ -232,7 +232,7 @@ class Robo24MissionWindow:
         self.mission.process_telemetry_packet(packet)
 
     def about_to_close_run_mission(self, window):
-        packet_json = {"nav_cmd": {"run_state": "stop"}}
+        packet_json = {"nav_cmd": {"mode": "none", "state": "done"}}
         packet_str = json.dumps(packet_json)+"\0"
         self.telemetry.send_packet(packet_str)
         print(f'Finished Mission: {packet_str=}')
