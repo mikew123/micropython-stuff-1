@@ -13,6 +13,9 @@ class Telemetry:
         self.wlan.config(channel=chan_num)
         self.wlan.disconnect()   # Because ESP8266 auto-connects to last Access Point
 
+        mac = self.wlan.config('mac')
+        print(':'.join([f"{b:02X}" for b in mac]))
+
         self.esp_now = espnow.ESPNow()
         self.esp_now.active(True)
         self.esp_now.irq(self.receive_callback)
